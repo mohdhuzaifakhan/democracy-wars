@@ -3,6 +3,8 @@ import { auth, db, rtdb } from '../config/firebase';
 import { ref, set as dbSet, onValue, push, get as dbGet, update as dbUpdate } from 'firebase/database';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { onAuthStateChanged, signInAnonymously, User } from 'firebase/auth';
+import { firebaseService } from '../services/firebase';
+
 
 
 interface VoterBlocs {
@@ -341,10 +343,28 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
   },
 
-  nextRound: () => set((state) => ({ 
-    currentRound: Math.min(state.currentRound + 1, state.totalRounds),
-    momentum: state.momentum + (state.currentRound > 5 ? 2 : 1)
-  })),
+  nextRound: () => set((state) => {
+    const nextR = Math.min(state.currentRound + 1, state.totalRounds);
+    const nextMomentum = state.momentum + (state.currentRound > 5 ? 2 : 1);
+    
+    // Auto-trigger background session backup sync
+    firebaseService.saveSession({
+      coins: state.profile.coins,
+      diamonds: state.profile.diamonds,
+      level: state.profile.level,
+      rankTitle: state.profile.rankTitle,
+      selectedPartyId: state.selectedPartyId || '',
+      selectedAvatarIndex: state.selectedAvatarIndex,
+      currentRound: nextR,
+      budget: state.budget,
+      trustScore: state.trustScore,
+    });
+
+    return { 
+      currentRound: nextR,
+      momentum: nextMomentum
+    };
+  }),
 
   resetGame: () => {
     const { roomCode, user, isHost } = get();
@@ -403,13 +423,28 @@ export const useGameStore = create<GameState>((set, get) => ({
         break;
     }
 
-    return { 
+    const nextState = { 
       blocApproval: newBlocs, 
       opponentApproval: newOpponent,
       budget: newBudget,
       trustScore: newTrust,
       corruptionRisk: newCorruption
     };
+
+    // Auto-trigger background session backup sync
+    firebaseService.saveSession({
+      coins: state.profile.coins,
+      diamonds: state.profile.diamonds,
+      level: state.profile.level,
+      rankTitle: state.profile.rankTitle,
+      selectedPartyId: state.selectedPartyId || '',
+      selectedAvatarIndex: state.selectedAvatarIndex,
+      currentRound: state.currentRound,
+      budget: newBudget,
+      trustScore: newTrust,
+    });
+
+    return nextState;
   }),
 
   resolveEvent: (impact) => set((state) => ({

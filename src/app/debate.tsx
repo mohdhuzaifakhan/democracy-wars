@@ -1,22 +1,98 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ImageBackground, Animated, Modal } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, FONTS, SPACING } from '../constants/theme';
 
+const STRATEGIES = [
+  {
+    id: '1',
+    title: 'OFFENSIVE DIRECT ATTACK',
+    desc: "Expose opponent's critical policy failures on jobs creation and industrial growth.",
+    forecast: '⚡ -15% Opponent approval rates • +10% Youth approvals • ⚠️ +15% Scandal Risk.',
+    icon: 'lightning-bolt',
+    color: COLORS.danger
+  },
+  {
+    id: '2',
+    title: 'FACTUAL RETALIATIVE DEFENSE',
+    desc: 'Provide comprehensive budget allocation integrity reports to defend your record.',
+    forecast: '⚡ +12% Popular trust score • +8% Business approvals • ✅ 0% Scandal Risk.',
+    icon: 'shield-check',
+    color: COLORS.success
+  },
+  {
+    id: '3',
+    title: 'HIGHLIGHT DOMESTIC VICTORIES',
+    desc: 'Showcase massive grassroots infrastructure milestones completed in rural provinces.',
+    forecast: '⚡ +15% Farmers approvals • +10% Seniors approvals • ✅ -5% Scandal Risk.',
+    icon: 'trophy-outline',
+    color: COLORS.primary
+  }
+];
+
 export default function DebateScreen() {
   const router = useRouter();
+  const [activeStrategy, setActiveStrategy] = useState<typeof STRATEGIES[0] | null>(null);
+
+  // Animation values
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(30)).current;
+  const flickerAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    // Fade and slide entry
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        friction: 5,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    // Constant flickering TV signal effect
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(flickerAnim, {
+          toValue: 0.7,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(flickerAnim, {
+          toValue: 1.0,
+          duration: 150,
+          useNativeDriver: true,
+        }),
+        Animated.timing(flickerAnim, {
+          toValue: 0.65,
+          duration: 400,
+          useNativeDriver: true,
+        }),
+        Animated.timing(flickerAnim, {
+          toValue: 1.0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, []);
 
   return (
     <View style={styles.container}>
-      <LinearGradient colors={['#0F172A', '#050B14']} style={StyleSheet.absoluteFill} />
+      <LinearGradient colors={[COLORS.background, '#090F1E']} style={StyleSheet.absoluteFill} />
 
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <MaterialCommunityIcons name="chevron-left" size={32} color="#FFF" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>DEBATE ROUND</Text>
+        <Text style={styles.headerTitle}>NATIONAL DEBATE</Text>
         <View style={{ width: 32 }} />
       </View>
 
@@ -25,62 +101,91 @@ export default function DebateScreen() {
           <ImageBackground 
             source={require('../../assets/images/debate.png')} 
             style={styles.cinematicBg}
-            imageStyle={{ borderRadius: 20 }}
+            imageStyle={{ borderRadius: 16 }}
           >
             <LinearGradient 
-              colors={['transparent', 'rgba(15, 23, 42, 0.8)', '#0F172A']} 
+              colors={['transparent', 'rgba(6, 9, 19, 0.7)', 'rgba(6, 9, 19, 0.95)']} 
               style={styles.cinematicGradient}
             >
-              <Text style={styles.cinematicTitle}>THE GREAT DEBATE</Text>
+              <Animated.View style={{ opacity: flickerAnim, alignItems: 'center' }}>
+                <Text style={styles.cinematicTitle}>LIVE NATIONAL BROADCAST</Text>
+                <Text style={styles.cinematicSubtitle}>DEBATE ON ECONOMIC & CAREER OUTLOOK</Text>
+              </Animated.View>
             </LinearGradient>
           </ImageBackground>
 
-          <View style={styles.strategySection}>
-            <Text style={styles.sectionLabel}>CHOOSE YOUR STRATEGY</Text>
+          <Animated.View style={[styles.strategySection, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
+            <Text style={styles.sectionLabel}>CHOOSE YOUR ORATORY STRATEGY</Text>
             
-            <TouchableOpacity style={styles.strategyBtn}>
-              <View style={styles.strategyLeft}>
-                <View style={[styles.strategyIconBox, { backgroundColor: 'rgba(239, 68, 68, 0.1)' }]}>
-                  <MaterialCommunityIcons name="lightning-bolt" size={24} color="#EF4444" />
-                </View>
-                <View style={styles.strategyInfo}>
-                  <Text style={styles.strategyTitle}>Attack Opponent</Text>
-                  <Text style={styles.strategyDesc}>Expose opponent's failure on jobs</Text>
-                </View>
-              </View>
-            </TouchableOpacity>
+            {STRATEGIES.map((strategy) => (
+              <View key={strategy.id} style={styles.btnContainer}>
+                <TouchableOpacity 
+                  style={styles.strategyBtn} 
+                  activeOpacity={0.8} 
+                  onPress={() => router.back()}
+                >
+                  <View style={styles.strategyLeft}>
+                    <View style={[styles.strategyIconBox, { backgroundColor: strategy.color + '15' }]}>
+                      <MaterialCommunityIcons name={strategy.icon as any} size={18} color={strategy.color} />
+                    </View>
+                    <Text style={styles.strategyTitle}>{strategy.title}</Text>
+                  </View>
+                </TouchableOpacity>
 
-            <TouchableOpacity style={styles.strategyBtn}>
-              <View style={styles.strategyLeft}>
-                <View style={[styles.strategyIconBox, { backgroundColor: 'rgba(34, 197, 94, 0.1)' }]}>
-                  <MaterialCommunityIcons name="shield-check" size={24} color="#22C55E" />
-                </View>
-                <View style={styles.strategyInfo}>
-                  <Text style={styles.strategyTitle}>Defend Yourself</Text>
-                  <Text style={styles.strategyDesc}>Defend your record & promises</Text>
-                </View>
+                {/* Gold Bulb trigger */}
+                <TouchableOpacity 
+                  style={[styles.strategyInfoBulb, { borderColor: strategy.color + '30' }]}
+                  activeOpacity={0.8}
+                  onPress={() => setActiveStrategy(strategy)}
+                >
+                  <MaterialCommunityIcons name="lightbulb-on-outline" size={14} color={strategy.color} />
+                </TouchableOpacity>
               </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.strategyBtn}>
-              <View style={styles.strategyLeft}>
-                <View style={[styles.strategyIconBox, { backgroundColor: 'rgba(59, 130, 246, 0.1)' }]}>
-                  <MaterialCommunityIcons name="trophy-outline" size={24} color="#3B82F6" />
-                </View>
-                <View style={styles.strategyInfo}>
-                  <Text style={styles.strategyTitle}>Highlight Achievements</Text>
-                  <Text style={styles.strategyDesc}>Showcase your best work</Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          </View>
+            ))}
+          </Animated.View>
 
           <View style={styles.votingFooter}>
-            <MaterialCommunityIcons name="timer-sand" size={16} color="#94A3B8" />
-            <Text style={styles.votingText}>Audience is voting...</Text>
+            <MaterialCommunityIcons name="timer-sand" size={14} color={COLORS.primary} />
+            <Text style={styles.votingText}>AUDIENCE DIAL RESPONSE VOTING LIVE...</Text>
           </View>
         </View>
       </View>
+
+      {/* Strategic Oratory Advisor Modal */}
+      {activeStrategy && (
+        <Modal
+          transparent={true}
+          visible={activeStrategy !== null}
+          animationType="fade"
+          onRequestClose={() => setActiveStrategy(null)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalCard}>
+              <LinearGradient colors={['#0F172A', '#060913']} style={StyleSheet.absoluteFill} />
+              
+              <View style={styles.modalHeader}>
+                <MaterialCommunityIcons name={activeStrategy.icon as any} size={24} color={activeStrategy.color} style={{ marginRight: 10 }} />
+                <Text style={styles.modalTitle}>{activeStrategy.title}</Text>
+              </View>
+
+              <Text style={styles.modalDesc}>{activeStrategy.desc}</Text>
+
+              <View style={styles.modalAdviceBox}>
+                <Text style={styles.adviceLabel}>ORATORY STRATEGIC FORECAST</Text>
+                <Text style={styles.adviceText}>{activeStrategy.forecast}</Text>
+              </View>
+
+              <TouchableOpacity 
+                style={[styles.modalCloseBtn, { backgroundColor: activeStrategy.color }]}
+                activeOpacity={0.8}
+                onPress={() => setActiveStrategy(null)}
+              >
+                <Text style={styles.modalCloseText}>CLOSE DOSSIER RECORD</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      )}
     </View>
   );
 }
@@ -97,31 +202,34 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingHorizontal: SPACING.md,
     paddingBottom: SPACING.md,
+    borderBottomWidth: 1,
+    borderColor: COLORS.border,
   },
   backButton: {
     padding: SPACING.xs,
   },
   headerTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 18,
+    fontSize: 16,
     color: COLORS.text,
-    letterSpacing: 1,
+    letterSpacing: 1.5,
   },
   content: {
     flex: 1,
-    paddingHorizontal: SPACING.lg,
+    paddingHorizontal: SPACING.md,
+    paddingTop: 16,
     paddingBottom: 40,
   },
   card: {
     flex: 1,
-    backgroundColor: 'rgba(30, 41, 59, 0.4)',
-    borderRadius: 24,
+    backgroundColor: 'rgba(27, 42, 74, 0.25)',
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
+    borderColor: COLORS.surfaceBorder,
     overflow: 'hidden',
   },
   cinematicBg: {
-    height: 220,
+    height: 180,
     width: '100%',
     justifyContent: 'flex-end',
   },
@@ -131,69 +239,154 @@ const styles = StyleSheet.create({
   },
   cinematicTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 22,
+    fontSize: 14,
     color: '#FFF',
     letterSpacing: 1.5,
-    textShadowColor: 'rgba(0,0,0,0.8)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 4,
+  },
+  cinematicSubtitle: {
+    fontFamily: FONTS.bold,
+    fontSize: 8,
+    color: COLORS.primary,
+    letterSpacing: 1,
+    marginTop: 4,
   },
   strategySection: {
-    padding: 20,
-    gap: 16,
+    padding: 16,
+    gap: 10,
   },
   sectionLabel: {
     fontFamily: FONTS.bold,
-    fontSize: 13,
-    color: '#94A3B8',
-    marginBottom: 8,
-    letterSpacing: 1,
+    fontSize: 9,
+    color: COLORS.textMuted,
+    letterSpacing: 1.5,
+    marginBottom: 4,
+  },
+  btnContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   strategyBtn: {
-    backgroundColor: 'rgba(15, 23, 42, 0.6)',
-    padding: 16,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
+    flex: 1,
+    backgroundColor: 'rgba(14, 23, 38, 0.6)',
+    padding: 12,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderColor: COLORS.surfaceBorder,
   },
   strategyLeft: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   strategyIconBox: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
+    width: 32,
+    height: 32,
+    borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 16,
-  },
-  strategyInfo: {
-    flex: 1,
+    marginRight: 12,
   },
   strategyTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 15,
-    color: '#F8FAFC',
+    fontSize: 10,
+    color: '#FFF',
+    letterSpacing: 0.5,
+    flex: 1,
   },
-  strategyDesc: {
-    fontFamily: FONTS.medium,
-    fontSize: 12,
-    color: '#94A3B8',
-    marginTop: 2,
+  strategyInfoBulb: {
+    width: 48,
+    height: 58,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    backgroundColor: 'rgba(14,23,38,0.5)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   votingFooter: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
-    backgroundColor: 'rgba(15, 23, 42, 0.3)',
+    padding: 14,
+    backgroundColor: 'rgba(14, 23, 38, 0.8)',
     marginTop: 'auto',
+    borderTopWidth: 1,
+    borderColor: COLORS.surfaceBorder,
   },
   votingText: {
-    fontFamily: FONTS.medium,
-    fontSize: 13,
-    color: '#94A3B8',
+    fontFamily: FONTS.bold,
+    fontSize: 8,
+    color: COLORS.textMuted,
     marginLeft: 8,
+    letterSpacing: 0.5,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(6,9,19,0.85)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalCard: {
+    width: '100%',
+    borderRadius: 24,
+    borderWidth: 1.5,
+    borderColor: COLORS.surfaceBorder,
+    padding: 20,
+    overflow: 'hidden',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+    borderBottomWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
+    paddingBottom: 12,
+  },
+  modalTitle: {
+    fontFamily: FONTS.bold,
+    fontSize: 13,
+    color: '#FFF',
+    letterSpacing: 0.5,
+    flex: 1,
+  },
+  modalDesc: {
+    fontFamily: FONTS.medium,
+    fontSize: 11,
+    color: COLORS.textMuted,
+    lineHeight: 16,
+    marginBottom: 20,
+  },
+  modalAdviceBox: {
+    backgroundColor: 'rgba(245, 158, 11, 0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(245, 158, 11, 0.12)',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 20,
+  },
+  adviceLabel: {
+    fontFamily: FONTS.bold,
+    fontSize: 8,
+    color: COLORS.primary,
+    letterSpacing: 1,
+    marginBottom: 4,
+  },
+  adviceText: {
+    fontFamily: FONTS.medium,
+    fontSize: 10,
+    color: '#F8FAFC',
+    lineHeight: 14,
+  },
+  modalCloseBtn: {
+    height: 48,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalCloseText: {
+    fontFamily: FONTS.bold,
+    fontSize: 11,
+    color: '#FFF',
+    letterSpacing: 1.5,
   },
 });

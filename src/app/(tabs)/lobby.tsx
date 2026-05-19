@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, TextInput } from 
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, FONTS, SPACING } from '../../constants/theme';
+import { COLORS, FONTS, SPACING, SHADOWS } from '../../constants/theme';
 import { useGameStore } from '../../store/gameStore';
 
 export default function LobbyScreen() {
@@ -28,8 +28,6 @@ export default function LobbyScreen() {
   const handleQuickMatch = async () => {
     setIsSearching(true);
     await startMatchmaking('Global', 'Normal');
-    // startMatchmaking will handle navigation internally in my simulation
-    // but in real app we'd wait for match:found
     setTimeout(() => {
       setIsSearching(false);
       router.push('/lobby-waiting');
@@ -51,7 +49,7 @@ export default function LobbyScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient colors={['#0F172A', '#050B14']} style={StyleSheet.absoluteFill} />
+      <LinearGradient colors={[COLORS.background, '#090F1E']} style={StyleSheet.absoluteFill} />
 
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
@@ -70,7 +68,7 @@ export default function LobbyScreen() {
             onPress={() => setActiveTab(tab as any)}
           >
             <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>
-              {tab.toUpperCase()}
+              {tab === 'quick' ? 'TACTICAL MATCH' : (tab === 'browser' ? 'ROOM FINDER' : 'HOST CAMPAIGN')}
             </Text>
           </TouchableOpacity>
         ))}
@@ -88,12 +86,22 @@ export default function LobbyScreen() {
     return (
       <View style={styles.panel}>
         <View style={styles.matchmakingInfo}>
-          <MaterialCommunityIcons name="radar" size={80} color={isSearching ? "#FACC15" : "#64748B"} />
-          <Text style={styles.matchTitle}>{isSearching ? "SEARCHING..." : "READY FOR BATTLE?"}</Text>
+          {/* Radar Ring Visuals */}
+          <View style={[styles.radarOuterCircle, isSearching && styles.radarOuterSearching]}>
+            <View style={[styles.radarInnerCircle, isSearching && styles.radarInnerSearching]}>
+              <MaterialCommunityIcons 
+                name="radar" 
+                size={54} 
+                color={isSearching ? COLORS.primary : COLORS.textMuted} 
+                style={isSearching ? { textShadowColor: COLORS.primary, textShadowRadius: 10 } : null}
+              />
+            </View>
+          </View>
+          <Text style={styles.matchTitle}>{isSearching ? "SCANNING SPECTRUMS..." : "READY TO ENGAGE?"}</Text>
           <Text style={styles.matchDesc}>
             {isSearching
-              ? "Finding best opponents based on your ELO rank..."
-              : "Jump into a game instantly with players of your skill level."}
+              ? "Connecting with high-level strategists across secure servers..."
+              : "Jump into an immediate 1v1 battleground with players of equal ELO rank."}
           </Text>
         </View>
 
@@ -101,26 +109,30 @@ export default function LobbyScreen() {
           style={styles.actionButtonWrapper}
           activeOpacity={0.8}
           onPress={handleQuickMatch}
-          disabled={isSearching}
         >
-          <LinearGradient colors={isSearching ? ['#475569', '#1E293B'] : ['#B91C1C', '#7F1D1D']} style={styles.actionButton}>
-            <Text style={styles.actionButtonText}>{isSearching ? "CANCEL SEARCH" : "FIND MATCH"}</Text>
+          <LinearGradient 
+            colors={isSearching ? ['#334155', '#1E293B'] : ['#E11D48', '#9F1239']} 
+            style={styles.actionButton}
+          >
+            <Text style={styles.actionButtonText}>
+              {isSearching ? "ABORT SEARCH" : "INITIATE MATCHMAKING"}
+            </Text>
           </LinearGradient>
         </TouchableOpacity>
 
         <View style={styles.statsRow}>
           <View style={styles.statItem}>
-            <Text style={styles.statVal}>1.2k</Text>
-            <Text style={styles.statLabel}>Online</Text>
+            <Text style={styles.statVal}>3.4k</Text>
+            <Text style={styles.statLabel}>Active</Text>
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statItem}>
-            <Text style={styles.statVal}>45s</Text>
-            <Text style={styles.statLabel}>Avg Time</Text>
+            <Text style={styles.statVal}>30s</Text>
+            <Text style={styles.statLabel}>Est Time</Text>
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statItem}>
-            <Text style={styles.statVal}>24ms</Text>
+            <Text style={styles.statVal}>18ms</Text>
             <Text style={styles.statLabel}>Ping</Text>
           </View>
         </View>
@@ -132,27 +144,27 @@ export default function LobbyScreen() {
     return (
       <View style={styles.browserContainer}>
         <View style={styles.searchBar}>
-          <MaterialCommunityIcons name="magnify" size={20} color="#64748B" />
+          <MaterialCommunityIcons name="magnify" size={20} color={COLORS.textMuted} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search by Room Code or Host..."
-            placeholderTextColor="#64748B"
+            placeholder="Search by Room Code or Host Advocate..."
+            placeholderTextColor="rgba(255,255,255,0.3)"
             value={roomCodeInput}
             onChangeText={setRoomCodeInput}
           />
           {roomCodeInput.length > 0 && (
-            <TouchableOpacity onPress={handleJoinByCode} style={styles.goBtn}>
-              <Text style={styles.goText}>GO</Text>
+            <TouchableOpacity onPress={handleJoinByCode} style={styles.goBtn} activeOpacity={0.8}>
+              <Text style={styles.goText}>ENTER</Text>
             </TouchableOpacity>
           )}
         </View>
 
         {publicRooms.length === 0 ? (
           <View style={styles.emptyState}>
-            <MaterialCommunityIcons name="server-off" size={48} color="#334155" />
-            <Text style={styles.emptyText}>No public rooms found.</Text>
-            <TouchableOpacity onPress={handleCreate}>
-              <Text style={styles.createLink}>Be the first to host!</Text>
+            <MaterialCommunityIcons name="server-off" size={48} color={COLORS.surfaceBorder} />
+            <Text style={styles.emptyText}>No active campaigns hosted.</Text>
+            <TouchableOpacity onPress={handleCreate} activeOpacity={0.7}>
+              <Text style={styles.createLink}>Create a custom campaign now</Text>
             </TouchableOpacity>
           </View>
         ) : (
@@ -160,18 +172,21 @@ export default function LobbyScreen() {
             <TouchableOpacity
               key={idx}
               style={styles.roomCard}
+              activeOpacity={0.8}
               onPress={() => joinRoom(room.code).then(() => router.push('/lobby-waiting'))}
             >
               <View style={styles.roomCardLeft}>
-                <Text style={styles.roomCode}>{room.code}</Text>
-                <Text style={styles.roomHost}>Host: {room.players[room.hostId]?.name || 'Unknown'}</Text>
+                <View style={styles.codeBadge}>
+                  <Text style={styles.roomCode}>{room.code}</Text>
+                </View>
+                <Text style={styles.roomHost}>Host: {room.players[room.hostId]?.name || 'Advocate Leader'}</Text>
               </View>
               <View style={styles.roomCardRight}>
                 <View style={styles.capacityBar}>
                   <View style={[styles.capacityFill, { width: `${(Object.keys(room.players).length / 6) * 100}%` }]} />
                 </View>
                 <Text style={styles.playerCount}>{Object.keys(room.players).length}/6</Text>
-                <MaterialCommunityIcons name="chevron-right" size={24} color="#FACC15" />
+                <MaterialCommunityIcons name="chevron-right" size={20} color={COLORS.primary} />
               </View>
             </TouchableOpacity>
           ))
@@ -183,33 +198,32 @@ export default function LobbyScreen() {
   function renderCreateLobby() {
     return (
       <View style={styles.panel}>
-        {/* Setting Row */}
         <View style={styles.settingRow}>
-          <Text style={styles.settingLabel}>Select Map</Text>
-          <TouchableOpacity style={styles.dropdown}>
+          <Text style={styles.settingLabel}>Strategic Map</Text>
+          <TouchableOpacity style={styles.dropdown} activeOpacity={0.8}>
             <Text style={styles.dropdownText}>{map}</Text>
-            <MaterialCommunityIcons name="map-marker-radius" size={20} color={COLORS.textMuted} />
+            <MaterialCommunityIcons name="map-marker-radius" size={18} color={COLORS.primary} />
           </TouchableOpacity>
         </View>
 
         <View style={styles.settingRow}>
-          <Text style={styles.settingLabel}>Max Players</Text>
-          <TouchableOpacity style={styles.dropdown}>
+          <Text style={styles.settingLabel}>Advocate Cap</Text>
+          <TouchableOpacity style={styles.dropdown} activeOpacity={0.8}>
             <Text style={styles.dropdownText}>{players}</Text>
-            <MaterialCommunityIcons name="account-group" size={20} color={COLORS.textMuted} />
+            <MaterialCommunityIcons name="account-group" size={18} color={COLORS.primary} />
           </TouchableOpacity>
         </View>
 
         <View style={styles.settingRow}>
-          <Text style={styles.settingLabel}>Difficulty</Text>
-          <TouchableOpacity style={styles.dropdown}>
+          <Text style={styles.settingLabel}>Difficulty Matrix</Text>
+          <TouchableOpacity style={styles.dropdown} activeOpacity={0.8}>
             <Text style={styles.dropdownText}>{difficulty}</Text>
-            <MaterialCommunityIcons name="sword" size={20} color={COLORS.textMuted} />
+            <MaterialCommunityIcons name="sword" size={18} color={COLORS.primary} />
           </TouchableOpacity>
         </View>
 
         <View style={styles.settingRow}>
-          <Text style={styles.settingLabel}>Allow AI Fill</Text>
+          <Text style={styles.settingLabel}>Fill Empty with AI bots</Text>
           <TouchableOpacity
             activeOpacity={0.8}
             style={[styles.toggle, aiFill && styles.toggleActive]}
@@ -225,7 +239,7 @@ export default function LobbyScreen() {
           onPress={handleCreate}
         >
           <LinearGradient colors={['#D97706', '#92400E']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.actionButton}>
-            <Text style={styles.actionButtonText}>CREATE ROOM</Text>
+            <Text style={styles.actionButtonText}>LAUNCH DEPLOYMENT ROOM</Text>
           </LinearGradient>
         </TouchableOpacity>
       </View>
@@ -246,6 +260,8 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingHorizontal: SPACING.md,
     paddingBottom: SPACING.md,
+    borderBottomWidth: 1,
+    borderColor: COLORS.border,
   },
   backButton: {
     padding: SPACING.xs,
@@ -254,265 +270,194 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.bold,
     fontSize: 18,
     color: COLORS.text,
-    letterSpacing: 1,
+    letterSpacing: 1.5,
   },
   tabContainer: {
     flexDirection: 'row',
-    marginHorizontal: SPACING.lg,
-    backgroundColor: 'rgba(30, 41, 59, 0.5)',
+    marginHorizontal: SPACING.md,
+    backgroundColor: 'rgba(14, 23, 38, 0.6)',
     borderRadius: 12,
     padding: 4,
-    marginBottom: SPACING.lg,
+    marginVertical: SPACING.md,
+    borderWidth: 1,
+    borderColor: COLORS.surfaceBorder,
   },
   tab: {
     flex: 1,
-    paddingVertical: 12,
+    paddingVertical: 10,
     alignItems: 'center',
     borderRadius: 8,
   },
   activeTab: {
-    backgroundColor: 'rgba(51, 65, 85, 0.8)',
+    backgroundColor: 'rgba(31, 41, 55, 0.7)',
   },
   tabText: {
-    fontFamily: FONTS.medium,
-    fontSize: 14,
+    fontFamily: FONTS.bold,
+    fontSize: 10,
     color: COLORS.textMuted,
+    letterSpacing: 0.5,
   },
   activeTabText: {
-    color: COLORS.text,
-    fontFamily: FONTS.bold,
+    color: COLORS.primary,
   },
   content: {
-    paddingHorizontal: SPACING.lg,
+    paddingHorizontal: SPACING.md,
     paddingBottom: 40,
   },
   panel: {
-    backgroundColor: 'rgba(15, 23, 42, 0.6)',
-    borderRadius: 24,
-    padding: SPACING.lg,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
-  },
-  roomCodeBox: {
-    backgroundColor: 'rgba(30, 41, 59, 0.5)',
-    borderRadius: 16,
+    backgroundColor: 'rgba(27, 42, 74, 0.25)',
+    borderRadius: 20,
     padding: SPACING.md,
-    marginBottom: SPACING.xl,
-  },
-  label: {
-    fontFamily: FONTS.medium,
-    fontSize: 12,
-    color: '#94A3B8',
-    letterSpacing: 1,
-    marginBottom: 8,
-  },
-  labelCenter: {
-    fontFamily: FONTS.medium,
-    fontSize: 12,
-    color: '#94A3B8',
-    letterSpacing: 1,
-    marginBottom: 12,
-    textAlign: 'center',
-  },
-  roomCodeRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  roomCodeText: {
-    fontFamily: FONTS.bold,
-    fontSize: 32,
-    color: '#F8FAFC',
-    letterSpacing: 2,
-  },
-  copyButton: {
-    backgroundColor: 'rgba(22, 163, 74, 0.2)',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'rgba(22, 163, 74, 0.5)',
-  },
-  copyButtonText: {
-    fontFamily: FONTS.bold,
-    fontSize: 12,
-    color: '#4ADE80',
-    letterSpacing: 1,
+    borderColor: COLORS.surfaceBorder,
   },
   settingRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: SPACING.lg,
+    marginBottom: 20,
   },
   settingLabel: {
-    fontFamily: FONTS.medium,
-    fontSize: 14,
+    fontFamily: FONTS.bold,
+    fontSize: 13,
     color: '#CBD5E1',
+    letterSpacing: 0.5,
   },
   dropdown: {
-    backgroundColor: 'rgba(30, 41, 59, 0.8)',
+    backgroundColor: 'rgba(14, 23, 38, 0.8)',
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
-    minWidth: 140,
+    borderColor: COLORS.surfaceBorder,
+    minWidth: 150,
     justifyContent: 'space-between',
   },
   dropdownText: {
-    fontFamily: FONTS.regular,
-    fontSize: 13,
+    fontFamily: FONTS.bold,
+    fontSize: 12,
     color: '#F8FAFC',
   },
   toggle: {
-    width: 50,
-    height: 28,
-    backgroundColor: 'rgba(30, 41, 59, 0.8)',
-    borderRadius: 14,
+    width: 48,
+    height: 26,
+    backgroundColor: 'rgba(14, 23, 38, 0.8)',
+    borderRadius: 13,
     padding: 2,
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.surfaceBorder,
   },
   toggleActive: {
-    backgroundColor: '#16A34A',
+    backgroundColor: COLORS.success,
   },
   toggleThumb: {
-    width: 24,
-    height: 24,
+    width: 20,
+    height: 20,
     backgroundColor: '#94A3B8',
-    borderRadius: 12,
+    borderRadius: 10,
   },
   toggleThumbActive: {
     backgroundColor: '#FFF',
     transform: [{ translateX: 22 }],
   },
-  inputContainer: {
-    marginBottom: SPACING.xl,
-  },
-  codeInputBox: {
-    backgroundColor: 'rgba(30, 41, 59, 0.5)',
-    borderRadius: 12,
-    paddingVertical: 16,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
-  },
-  placeholderText: {
-    fontFamily: FONTS.regular,
-    fontSize: 14,
-    color: '#64748B',
-  },
-  codeText: {
-    fontFamily: FONTS.bold,
-    fontSize: 24,
-    color: '#F8FAFC',
-    letterSpacing: 4,
-  },
-  numpad: {
-    marginBottom: SPACING.xl,
-  },
-  numpadRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 12,
-  },
-  numpadKey: {
-    width: '22%',
-    aspectRatio: 1,
-    backgroundColor: 'rgba(30, 41, 59, 0.8)',
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  numpadKeyDark: {
-    backgroundColor: 'rgba(15, 23, 42, 0.8)',
-  },
-  numpadText: {
-    fontFamily: FONTS.medium,
-    fontSize: 24,
-    color: '#F8FAFC',
-  },
-  numpadTextDark: {
-    color: '#94A3B8',
-  },
   actionButtonWrapper: {
     borderRadius: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.5,
+    shadowOpacity: 0.4,
     shadowRadius: 8,
-    elevation: 6,
-    marginTop: SPACING.md,
+    elevation: 4,
+    marginTop: 10,
   },
   actionButton: {
-    height: 56,
+    height: 52,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
   actionButtonText: {
     fontFamily: FONTS.bold,
-    fontSize: 16,
+    fontSize: 14,
     color: '#FFF',
-    letterSpacing: 1,
+    letterSpacing: 1.5,
   },
-  // New Styles
   matchmakingInfo: {
     alignItems: 'center',
-    paddingVertical: SPACING.xl,
+    paddingVertical: 20,
+  },
+  radarOuterCircle: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: 'rgba(255,255,255,0.02)',
+    borderWidth: 1,
+    borderColor: COLORS.surfaceBorder,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  radarOuterSearching: {
+    borderColor: 'rgba(245, 158, 11, 0.3)',
+  },
+  radarInnerCircle: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderWidth: 1,
+    borderColor: COLORS.surfaceBorder,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  radarInnerSearching: {
+    borderColor: 'rgba(245, 158, 11, 0.5)',
   },
   matchTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 24,
+    fontSize: 20,
     color: '#F8FAFC',
-    marginTop: SPACING.lg,
-    letterSpacing: 1,
+    marginTop: 20,
+    letterSpacing: 1.5,
   },
   matchDesc: {
     fontFamily: FONTS.medium,
-    fontSize: 14,
-    color: '#94A3B8',
+    fontSize: 13,
+    color: COLORS.textMuted,
     textAlign: 'center',
     marginTop: 8,
-    lineHeight: 20,
+    lineHeight: 18,
+    paddingHorizontal: 10,
   },
   statsRow: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: SPACING.xl,
-    paddingTop: SPACING.lg,
+    marginTop: 25,
+    paddingTop: 20,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.05)',
+    borderColor: 'rgba(255,255,255,0.06)',
   },
   statItem: {
     alignItems: 'center',
   },
   statVal: {
     fontFamily: FONTS.bold,
-    fontSize: 16,
-    color: '#FACC15',
+    fontSize: 15,
+    color: COLORS.primary,
   },
   statLabel: {
-    fontFamily: FONTS.medium,
-    fontSize: 10,
-    color: '#64748B',
+    fontFamily: FONTS.bold,
+    fontSize: 9,
+    color: COLORS.textMuted,
     textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   statDivider: {
     width: 1,
-    height: 20,
+    height: 16,
     backgroundColor: 'rgba(255,255,255,0.1)',
-    mx: SPACING.lg,
     marginHorizontal: SPACING.lg,
   },
   browserContainer: {
@@ -521,54 +466,66 @@ const styles = StyleSheet.create({
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(30, 41, 59, 0.8)',
+    backgroundColor: 'rgba(14, 23, 38, 0.8)',
     borderRadius: 12,
     paddingHorizontal: 12,
-    height: 50,
+    height: 52,
+    borderWidth: 1,
+    borderColor: COLORS.surfaceBorder,
     marginBottom: 8,
   },
   searchInput: {
     flex: 1,
     fontFamily: FONTS.medium,
-    fontSize: 14,
+    fontSize: 13,
     color: '#F8FAFC',
     marginLeft: 8,
   },
   goBtn: {
-    backgroundColor: '#D97706',
+    backgroundColor: COLORS.primary,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 6,
   },
   goText: {
     fontFamily: FONTS.bold,
-    fontSize: 12,
+    fontSize: 11,
     color: '#FFF',
+    letterSpacing: 0.5,
   },
   roomCard: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: 'rgba(30, 41, 59, 0.4)',
+    backgroundColor: 'rgba(27, 42, 74, 0.25)',
     padding: 16,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
+    borderColor: COLORS.surfaceBorder,
   },
   roomCardLeft: {
     flex: 1,
   },
+  codeBadge: {
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(245, 158, 11, 0.2)',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
   roomCode: {
     fontFamily: FONTS.bold,
-    fontSize: 18,
-    color: '#F8FAFC',
+    fontSize: 15,
+    color: COLORS.primary,
     letterSpacing: 1,
   },
   roomHost: {
     fontFamily: FONTS.medium,
     fontSize: 12,
-    color: '#94A3B8',
-    marginTop: 2,
+    color: COLORS.textMuted,
+    marginTop: 6,
   },
   roomCardRight: {
     flexDirection: 'row',
@@ -577,20 +534,20 @@ const styles = StyleSheet.create({
   },
   capacityBar: {
     width: 60,
-    height: 6,
+    height: 4,
     backgroundColor: 'rgba(255,255,255,0.05)',
-    borderRadius: 3,
+    borderRadius: 2,
     overflow: 'hidden',
   },
   capacityFill: {
     height: '100%',
-    backgroundColor: '#FACC15',
+    backgroundColor: COLORS.primary,
   },
   playerCount: {
     fontFamily: FONTS.bold,
-    fontSize: 14,
+    fontSize: 13,
     color: '#F8FAFC',
-    minWidth: 35,
+    minWidth: 30,
   },
   emptyState: {
     alignItems: 'center',
@@ -598,15 +555,16 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontFamily: FONTS.medium,
-    fontSize: 14,
-    color: '#64748B',
+    fontSize: 13,
+    color: COLORS.textMuted,
     marginTop: 12,
   },
   createLink: {
     fontFamily: FONTS.bold,
-    fontSize: 14,
-    color: '#FACC15',
-    marginTop: 8,
+    fontSize: 13,
+    color: COLORS.primary,
+    marginTop: 6,
     textDecorationLine: 'underline',
+    letterSpacing: 0.5,
   },
 });

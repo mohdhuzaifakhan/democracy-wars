@@ -3,87 +3,106 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput, ImageBackground, S
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { COLORS, FONTS, SPACING } from '../constants/theme';
+import { COLORS, FONTS, SPACING, SHADOWS } from '../constants/theme';
 
 export default function SignupScreen() {
   const router = useRouter();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [isNameFocused, setIsNameFocused] = useState(false);
+  const [isPhoneFocused, setIsPhoneFocused] = useState(false);
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
   return (
     <View style={styles.container}>
       <ImageBackground 
         source={require('../../assets/images/login_bg.png')} 
         style={StyleSheet.absoluteFill}
-        blurRadius={2}
+        blurRadius={3}
       >
         <LinearGradient 
-          colors={['rgba(15, 23, 42, 0.6)', 'rgba(15, 23, 42, 0.9)', '#0F172A']} 
+          colors={['rgba(6, 9, 19, 0.45)', 'rgba(6, 9, 19, 0.85)', COLORS.background]} 
           style={StyleSheet.absoluteFill} 
         />
       </ImageBackground>
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
           <MaterialCommunityIcons name="chevron-left" size={32} color="#FFF" />
         </TouchableOpacity>
 
         <View style={styles.header}>
-          <Text style={styles.title}>Create Account</Text>
-          <Text style={styles.subtitle}>Join the battle for democracy.</Text>
+          <Text style={styles.title}>CREATE ACCOUNT</Text>
+          <Text style={styles.subtitle}>Enlist as an advocate. Lead the democracy war.</Text>
         </View>
 
         <View style={styles.form}>
-          <View style={styles.inputContainer}>
+          <View style={[
+            styles.inputContainer,
+            isNameFocused && styles.inputContainerFocused
+          ]}>
             <TextInput
               style={styles.input}
-              placeholder="Full Name"
-              placeholderTextColor="#64748B"
+              placeholder="Enter full name"
+              placeholderTextColor="rgba(255,255,255,0.3)"
               value={name}
               onChangeText={setName}
+              onFocus={() => setIsNameFocused(true)}
+              onBlur={() => setIsNameFocused(false)}
             />
           </View>
 
-          <View style={styles.inputContainer}>
+          <View style={[
+            styles.inputContainer,
+            isPhoneFocused && styles.inputContainerFocused
+          ]}>
             <View style={styles.phonePrefix}>
               <Text style={styles.prefixText}>+91</Text>
               <View style={styles.divider} />
             </View>
             <TextInput
               style={styles.input}
-              placeholder="Mobile Number"
-              placeholderTextColor="#64748B"
+              placeholder="Mobile number"
+              placeholderTextColor="rgba(255,255,255,0.3)"
               keyboardType="phone-pad"
               value={phone}
               onChangeText={setPhone}
+              onFocus={() => setIsPhoneFocused(true)}
+              onBlur={() => setIsPhoneFocused(false)}
             />
           </View>
 
-          <View style={styles.inputContainer}>
+          <View style={[
+            styles.inputContainer,
+            isPasswordFocused && styles.inputContainerFocused
+          ]}>
             <TextInput
               style={styles.input}
-              placeholder="Create Password"
-              placeholderTextColor="#64748B"
+              placeholder="Create secure passkey"
+              placeholderTextColor="rgba(255,255,255,0.3)"
               secureTextEntry
               value={password}
               onChangeText={setPassword}
+              onFocus={() => setIsPasswordFocused(true)}
+              onBlur={() => setIsPasswordFocused(false)}
             />
           </View>
 
           <TouchableOpacity 
             style={styles.signupBtn}
+            activeOpacity={0.8}
             onPress={() => router.replace('/(tabs)/lobby')}
           >
-            <LinearGradient colors={['#B91C1C', '#7F1D1D']} style={styles.btnGradient}>
-              <Text style={styles.signupText}>CREATE ACCOUNT</Text>
+            <LinearGradient colors={['#E11D48', '#881337']} start={{x: 0, y: 0}} end={{x: 1, y: 1}} style={styles.btnGradient}>
+              <Text style={styles.signupText}>COMMENCE RECRUITMENT</Text>
             </LinearGradient>
           </TouchableOpacity>
 
           <View style={styles.loginRow}>
-            <Text style={styles.loginLabel}>Already have an account? </Text>
+            <Text style={styles.loginLabel}>Registered advocate? </Text>
             <TouchableOpacity onPress={() => router.push('/login')}>
-              <Text style={styles.loginLink}>Login</Text>
+              <Text style={styles.loginLink}>LOGIN HERE</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -95,7 +114,7 @@ export default function SignupScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0F172A',
+    backgroundColor: COLORS.background,
   },
   scrollContent: {
     paddingHorizontal: 24,
@@ -103,21 +122,23 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   backButton: {
-    marginBottom: 40,
+    marginBottom: 30,
   },
   header: {
-    marginBottom: 40,
+    marginBottom: 35,
   },
   title: {
     fontFamily: FONTS.bold,
-    fontSize: 32,
+    fontSize: 28,
     color: '#FFF',
+    letterSpacing: 2,
   },
   subtitle: {
     fontFamily: FONTS.medium,
-    fontSize: 16,
-    color: '#94A3B8',
-    marginTop: 8,
+    fontSize: 14,
+    color: COLORS.textMuted,
+    marginTop: 6,
+    lineHeight: 20,
   },
   form: {
     gap: 16,
@@ -125,12 +146,20 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(15, 23, 42, 0.8)',
-    height: 64,
-    borderRadius: 16,
+    backgroundColor: 'rgba(14, 23, 38, 0.75)',
+    height: 60,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: COLORS.surfaceBorder,
     paddingHorizontal: 16,
+  },
+  inputContainerFocused: {
+    borderColor: COLORS.primary,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
   phonePrefix: {
     flexDirection: 'row',
@@ -139,55 +168,56 @@ const styles = StyleSheet.create({
   },
   prefixText: {
     fontFamily: FONTS.bold,
-    fontSize: 16,
+    fontSize: 15,
     color: '#F8FAFC',
     marginRight: 12,
   },
   divider: {
     width: 1,
-    height: 24,
+    height: 20,
     backgroundColor: 'rgba(255,255,255,0.1)',
   },
   input: {
     flex: 1,
     fontFamily: FONTS.medium,
-    fontSize: 16,
+    fontSize: 14,
     color: '#FFF',
   },
   signupBtn: {
-    borderRadius: 16,
+    borderRadius: 12,
     overflow: 'hidden',
     marginTop: 10,
-    shadowColor: '#B91C1C',
+    shadowColor: '#E11D48',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.4,
     shadowRadius: 10,
     elevation: 8,
   },
   btnGradient: {
-    height: 60,
+    height: 56,
     alignItems: 'center',
     justifyContent: 'center',
   },
   signupText: {
     fontFamily: FONTS.bold,
-    fontSize: 18,
+    fontSize: 16,
     color: '#FFF',
-    letterSpacing: 1,
+    letterSpacing: 1.5,
   },
   loginRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 20,
+    marginTop: 25,
   },
   loginLabel: {
     fontFamily: FONTS.medium,
-    fontSize: 14,
-    color: '#94A3B8',
+    fontSize: 13,
+    color: COLORS.textMuted,
   },
   loginLink: {
     fontFamily: FONTS.bold,
-    fontSize: 14,
-    color: '#3B82F6',
+    fontSize: 13,
+    color: COLORS.primary,
+    letterSpacing: 1,
   },
 });

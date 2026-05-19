@@ -10,13 +10,13 @@ export default function ResultScreen() {
 
   return (
     <View style={styles.container}>
-      <LinearGradient colors={['#0F172A', '#050B14']} style={StyleSheet.absoluteFill} />
+      <LinearGradient colors={[COLORS.background, '#090F1E']} style={StyleSheet.absoluteFill} />
 
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.replace('/(tabs)/lobby')} style={styles.backButton}>
           <MaterialCommunityIcons name="close" size={32} color="#FFF" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>RESULTS SCREEN</Text>
+        <Text style={styles.headerTitle}>CAMPAIGN DECLARED</Text>
         <View style={{ width: 32 }} />
       </View>
 
@@ -25,47 +25,51 @@ export default function ResultScreen() {
           <ImageBackground 
             source={require('../../assets/images/victory.png')} 
             style={styles.victoryImg}
-            imageStyle={{ borderRadius: 20 }}
+            imageStyle={{ borderRadius: 16 }}
           >
             <LinearGradient 
-              colors={['transparent', 'rgba(15, 23, 42, 0.4)', 'rgba(15, 23, 42, 0.9)']} 
+              colors={['transparent', 'rgba(6, 9, 19, 0.5)', 'rgba(6, 9, 19, 0.95)']} 
               style={styles.victoryGradient}
             >
-              <Text style={styles.victoryTitle}>VICTORY!</Text>
-              <Text style={styles.victorySubtitle}>YOU WON THE ELECTION</Text>
+              <Text style={styles.victoryTitle}>LANDSLIDE VICTORY!</Text>
+              <Text style={styles.victorySubtitle}>YOU SOVEREIGNLY WON THE CAMPAIGN ELECTION</Text>
             </LinearGradient>
           </ImageBackground>
 
           <View style={styles.statsRow}>
             <View style={styles.statBox}>
-              <Text style={styles.statLabel}>SEATS WON</Text>
+              <Text style={styles.statLabel}>SEATS CONQUERED</Text>
               <Text style={styles.statValue}>285 <Text style={styles.statSmall}>/ 543</Text></Text>
             </View>
             <View style={[styles.statBox, styles.statBorder]}>
-              <Text style={styles.statLabel}>VOTE SHARE</Text>
-              <Text style={styles.statValue}>42.6%</Text>
+              <Text style={styles.statLabel}>VOTE RATIO</Text>
+              <Text style={[styles.statValue, { color: COLORS.success }]}>42.6%</Text>
             </View>
             <View style={styles.statBox}>
               <Text style={styles.statLabel}>FINAL APPROVAL</Text>
-              <Text style={styles.statValue}>48%</Text>
+              <Text style={[styles.statValue, { color: COLORS.primary }]}>48%</Text>
             </View>
           </View>
 
           <View style={styles.badgeRow}>
-             {/* Mock small badges or icons */}
-             <View style={styles.miniBadge} />
-             <View style={styles.miniBadge} />
+             <View style={styles.miniBadge}>
+               <MaterialCommunityIcons name="star-decagram" size={16} color={COLORS.primary} />
+             </View>
+             <View style={styles.miniBadge}>
+               <MaterialCommunityIcons name="medal-outline" size={16} color={COLORS.secondary} />
+             </View>
           </View>
 
           <View style={styles.actions}>
-            <TouchableOpacity style={styles.detailsBtn}>
-              <Text style={styles.detailsText}>VIEW DETAILS</Text>
+            <TouchableOpacity style={styles.detailsBtn} activeOpacity={0.8} onPress={() => router.replace('/(tabs)/lobby')}>
+              <Text style={styles.detailsText}>LOBBY WAR ROOM</Text>
             </TouchableOpacity>
             <TouchableOpacity 
               style={styles.playAgainBtn}
+              activeOpacity={0.8}
               onPress={() => router.push('/rewards')}
             >
-              <LinearGradient colors={['#D97706', '#92400E']} style={styles.playGradient}>
+              <LinearGradient colors={['#E11D48', '#881337']} style={styles.playGradient}>
                 <Text style={styles.playText}>CLAIM REWARDS</Text>
               </LinearGradient>
             </TouchableOpacity>
@@ -88,63 +92,62 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingHorizontal: SPACING.md,
     paddingBottom: SPACING.md,
+    borderBottomWidth: 1,
+    borderColor: COLORS.border,
   },
   backButton: {
     padding: SPACING.xs,
   },
   headerTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 18,
+    fontSize: 16,
     color: COLORS.text,
-    letterSpacing: 1,
+    letterSpacing: 1.5,
   },
   content: {
     flex: 1,
-    padding: SPACING.lg,
-    paddingBottom: 40,
+    padding: SPACING.md,
   },
   mainCard: {
     flex: 1,
-    backgroundColor: 'rgba(30, 41, 59, 0.4)',
-    borderRadius: 24,
+    backgroundColor: 'rgba(27, 42, 74, 0.25)',
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
+    borderColor: COLORS.surfaceBorder,
     overflow: 'hidden',
     padding: 16,
   },
   victoryImg: {
-    height: 350,
+    height: 280,
     width: '100%',
     justifyContent: 'flex-end',
   },
   victoryGradient: {
-    padding: 20,
+    padding: 16,
     alignItems: 'center',
   },
   victoryTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 36,
-    color: '#FACC15',
-    letterSpacing: 3,
-    textShadowColor: 'rgba(0,0,0,0.8)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 10,
+    fontSize: 22,
+    color: COLORS.primary,
+    letterSpacing: 2,
   },
   victorySubtitle: {
     fontFamily: FONTS.bold,
-    fontSize: 14,
-    color: '#F8FAFC',
+    fontSize: 8,
+    color: '#FFF',
     letterSpacing: 1,
     marginTop: 4,
+    textAlign: 'center',
   },
   statsRow: {
     flexDirection: 'row',
-    marginTop: 20,
-    backgroundColor: 'rgba(15, 23, 42, 0.5)',
+    marginTop: 16,
+    backgroundColor: 'rgba(14, 23, 38, 0.6)',
     borderRadius: 16,
-    paddingVertical: 16,
+    paddingVertical: 14,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.03)',
+    borderColor: COLORS.surfaceBorder,
   },
   statBox: {
     flex: 1,
@@ -153,55 +156,61 @@ const styles = StyleSheet.create({
   statBorder: {
     borderLeftWidth: 1,
     borderRightWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
+    borderColor: COLORS.surfaceBorder,
   },
   statLabel: {
     fontFamily: FONTS.bold,
-    fontSize: 9,
-    color: '#94A3B8',
+    fontSize: 8,
+    color: COLORS.textMuted,
     letterSpacing: 0.5,
     marginBottom: 4,
   },
   statValue: {
     fontFamily: FONTS.bold,
-    fontSize: 18,
-    color: '#F8FAFC',
+    fontSize: 14,
+    color: '#FFF',
+    letterSpacing: 0.5,
   },
   statSmall: {
-    fontSize: 12,
-    color: '#94A3B8',
+    fontSize: 10,
+    color: COLORS.textMuted,
   },
   badgeRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 16,
-    marginVertical: 20,
+    gap: 12,
+    marginVertical: 16,
   },
   miniBadge: {
-    width: 32,
-    height: 32,
-    borderRadius: 6,
-    backgroundColor: 'rgba(255,255,255,0.05)',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(14, 23, 38, 0.6)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: COLORS.surfaceBorder,
   },
   actions: {
     flexDirection: 'row',
-    gap: 12,
+    gap: 10,
     marginTop: 'auto',
   },
   detailsBtn: {
     flex: 1,
-    height: 56,
+    height: 52,
     borderRadius: 12,
-    backgroundColor: 'rgba(30, 41, 59, 0.8)',
+    backgroundColor: 'rgba(14, 23, 38, 0.6)',
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
+    borderWidth: 1.5,
+    borderColor: COLORS.surfaceBorder,
   },
   detailsText: {
     fontFamily: FONTS.bold,
-    fontSize: 14,
-    color: '#F8FAFC',
+    fontSize: 11,
+    color: '#FFF',
+    letterSpacing: 0.5,
   },
   playAgainBtn: {
     flex: 1.5,
@@ -209,14 +218,14 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   playGradient: {
-    height: 56,
+    height: 52,
     alignItems: 'center',
     justifyContent: 'center',
   },
   playText: {
     fontFamily: FONTS.bold,
-    fontSize: 14,
+    fontSize: 12,
     color: '#FFF',
-    letterSpacing: 1,
+    letterSpacing: 1.5,
   },
 });

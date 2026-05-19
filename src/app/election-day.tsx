@@ -16,29 +16,27 @@ export default function ElectionDayScreen() {
   const results = calculateWinner();
 
   const DISPLAY_RESULTS = [
-    { id: '1', name: 'Your Party', seats: results.playerVotes / 100, color: '#EF4444' }, // Scaling for UI display
-    { id: '2', name: 'Opposition', seats: results.opponentVotes / 100, color: '#3B82F6' },
+    { id: '1', name: 'YOUR COALITION', seats: results.playerVotes / 100, color: COLORS.secondary },
+    { id: '2', name: 'OPPOSITION BLOC', seats: results.opponentVotes / 100, color: COLORS.danger },
   ];
-
-  const totalSeats = Math.floor((results.playerVotes + results.opponentVotes) / 100);
 
   return (
     <View style={styles.container}>
-      <LinearGradient colors={['#0F172A', '#050B14']} style={StyleSheet.absoluteFill} />
+      <LinearGradient colors={[COLORS.background, '#090F1E']} style={StyleSheet.absoluteFill} />
 
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <MaterialCommunityIcons name="chevron-left" size={32} color="#FFF" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>ELECTION DAY</Text>
+        <Text style={styles.headerTitle}>ELECTION DISPATCH</Text>
         <View style={{ width: 32 }} />
       </View>
 
       <View style={styles.content}>
         <View style={styles.mainCard}>
           <View style={styles.countingHeader}>
-            <Text style={styles.electionDayTitle}>LIVE RESULTS</Text>
-            <Text style={styles.countingText}>Final Vote Counting...</Text>
+            <Text style={styles.electionDayTitle}>LIVE POLL COUNTING</Text>
+            <Text style={styles.countingText}>REAL-TIME REGIONAL FEED</Text>
           </View>
 
           <View style={styles.mapResultRow}>
@@ -69,8 +67,8 @@ export default function ElectionDayScreen() {
           </View>
 
           <View style={styles.liveResultsBox}>
-            <Text style={styles.liveResultsTitle}>VICTORY MARGIN</Text>
-            <Text style={styles.totalSeats}>{results.winner === 'Player' ? 'YOU ARE LEADING' : 'OPPOSITION AHEAD'}</Text>
+            <Text style={styles.liveResultsTitle}>VICTORY PROJECTIONS</Text>
+            <Text style={styles.totalSeats}>{results.winner === 'Player' ? 'YOU LEADING THE POLLS' : 'OPPOSITION BLOC IN THE LEAD'}</Text>
             
             <View style={styles.progressBarWrapper}>
               <View 
@@ -78,7 +76,7 @@ export default function ElectionDayScreen() {
                   styles.progressBar, 
                   { 
                     width: `${(results.playerVotes / (results.playerVotes + results.opponentVotes)) * 100}%`,
-                    backgroundColor: results.winner === 'Player' ? '#EF4444' : '#3B82F6'
+                    backgroundColor: results.winner === 'Player' ? COLORS.secondary : COLORS.danger
                   }
                 ]} 
               />
@@ -88,10 +86,11 @@ export default function ElectionDayScreen() {
 
         <TouchableOpacity 
           style={styles.finishButton} 
+          activeOpacity={0.8}
           onPress={() => router.push('/coalition')}
         >
-          <LinearGradient colors={['#D97706', '#92400E']} style={styles.finishGradient}>
-            <Text style={styles.finishText}>PROCEED TO COALITION</Text>
+          <LinearGradient colors={['#E11D48', '#881337']} style={styles.finishGradient}>
+            <Text style={styles.finishText}>FORM COALITION FORCES</Text>
           </LinearGradient>
         </TouchableOpacity>
       </View>
@@ -111,44 +110,47 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingHorizontal: SPACING.md,
     paddingBottom: SPACING.md,
+    borderBottomWidth: 1,
+    borderColor: COLORS.border,
   },
   backButton: {
     padding: SPACING.xs,
   },
   headerTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 18,
+    fontSize: 16,
     color: COLORS.text,
-    letterSpacing: 1,
+    letterSpacing: 1.5,
   },
   content: {
     flex: 1,
-    padding: SPACING.lg,
+    padding: SPACING.md,
   },
   mainCard: {
     flex: 1,
-    backgroundColor: 'rgba(30, 41, 59, 0.4)',
-    borderRadius: 24,
+    backgroundColor: 'rgba(27, 42, 74, 0.25)',
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
-    padding: 20,
-    marginBottom: 20,
+    borderColor: COLORS.surfaceBorder,
+    padding: 16,
+    marginBottom: 16,
   },
   countingHeader: {
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 16,
   },
   electionDayTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 20,
-    color: '#EC4899',
+    fontSize: 15,
+    color: COLORS.primary,
     letterSpacing: 1.5,
   },
   countingText: {
-    fontFamily: FONTS.medium,
-    fontSize: 13,
-    color: '#94A3B8',
-    marginTop: 4,
+    fontFamily: FONTS.bold,
+    fontSize: 9,
+    color: COLORS.textMuted,
+    marginTop: 2,
+    letterSpacing: 0.5,
   },
   mapResultRow: {
     flexDirection: 'row',
@@ -162,30 +164,30 @@ const styles = StyleSheet.create({
   mapImg: {
     width: '100%',
     height: '100%',
-    opacity: 0.9,
+    opacity: 0.75,
   },
   sidebar: {
-    width: 120,
-    backgroundColor: 'rgba(15, 23, 42, 0.6)',
-    borderRadius: 16,
-    padding: 12,
+    width: 110,
+    backgroundColor: 'rgba(14, 23, 38, 0.6)',
+    borderRadius: 12,
+    padding: 10,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.05)',
-    height: 300,
+    borderColor: COLORS.surfaceBorder,
+    height: 220,
     alignSelf: 'center',
   },
   sidebarHeader: {
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)',
-    paddingBottom: 8,
+    borderColor: COLORS.surfaceBorder,
+    paddingBottom: 6,
     marginBottom: 8,
   },
   sidebarTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 10,
-    color: '#94A3B8',
+    fontSize: 9,
+    color: COLORS.textMuted,
     textAlign: 'center',
-    letterSpacing: 1,
+    letterSpacing: 0.5,
   },
   seatRow: {
     flexDirection: 'row',
@@ -196,53 +198,54 @@ const styles = StyleSheet.create({
   seatLeft: {
     flexDirection: 'row',
     alignItems: 'center',
+    flex: 1,
   },
   colorDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
     marginRight: 6,
   },
   nameText: {
-    fontFamily: FONTS.medium,
-    fontSize: 12,
+    fontFamily: FONTS.bold,
+    fontSize: 8,
     color: '#CBD5E1',
+    letterSpacing: 0.5,
   },
   seatValue: {
     fontFamily: FONTS.bold,
-    fontSize: 12,
+    fontSize: 10,
   },
   liveResultsBox: {
-    marginTop: 20,
-    backgroundColor: 'rgba(15, 23, 42, 0.4)',
+    marginTop: 16,
+    backgroundColor: 'rgba(14, 23, 38, 0.6)',
     borderRadius: 16,
-    padding: 16,
+    padding: 14,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.03)',
+    borderColor: COLORS.surfaceBorder,
   },
   liveResultsTitle: {
     fontFamily: FONTS.bold,
-    fontSize: 14,
-    color: '#F8FAFC',
+    fontSize: 10,
+    color: '#FFF',
     letterSpacing: 1,
   },
   totalSeats: {
     fontFamily: FONTS.bold,
-    fontSize: 18,
-    color: '#CBD5E1',
-    marginVertical: 8,
+    fontSize: 13,
+    color: COLORS.textMuted,
+    marginVertical: 6,
   },
   progressBarWrapper: {
     width: '100%',
-    height: 12,
-    backgroundColor: 'rgba(30, 41, 59, 0.8)',
-    borderRadius: 6,
+    height: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 4,
     overflow: 'hidden',
   },
   progressBar: {
     height: '100%',
-    width: '80%', // Mock percentage
   },
   finishButton: {
     width: '100%',
@@ -250,19 +253,19 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.5,
+    shadowOpacity: 0.4,
     shadowRadius: 8,
-    elevation: 6,
+    elevation: 4,
   },
   finishGradient: {
-    height: 56,
+    height: 52,
     alignItems: 'center',
     justifyContent: 'center',
   },
   finishText: {
     fontFamily: FONTS.bold,
-    fontSize: 18,
+    fontSize: 14,
     color: '#FFF',
-    letterSpacing: 2,
+    letterSpacing: 1.5,
   },
 });
